@@ -27,19 +27,21 @@ public class MainGame
     var game : Game
     var currentPlayer : CurrentPlayer
     var firstTurn : Bool
+    var liarThreshold : Double
 
     
     init()
     {
         gamestate = .start
         game = Game()
-        currentPlayer = CurrentPlayer.allCases.randomElement()!
+        currentPlayer = .player
         firstTurn = true
+        liarThreshold = 0.4
     }
     
     func play()
     {
-        while self.gamestate != .finished
+        mainloop: while self.gamestate != .finished
         {
             switch gamestate {
             
@@ -48,7 +50,7 @@ public class MainGame
                 print("[INFO] The round is started.")
                 print("[INFO] Rolling the dice.")
                 game.roll()
-                game.currentBidRoll = 0
+                game.currentBidRoll = 1
                 game.currentBidNumber = 0
                 var answerAccepted = false
                 switch currentPlayer {
@@ -138,6 +140,10 @@ public class MainGame
                 switch currentPlayer {
                 case .player:
                     print("[INFO] Player calls opponent a Liar.")
+                    print("Player's hand:")
+                    print(game.getPlayerHand())
+                    print("Opponent's hand:")
+                    print(game.getOpponentHand())
                     let (win, sumRoll, biddedRoll) = game.playerCallsLiar()
                     if win
                     {
@@ -153,8 +159,12 @@ public class MainGame
                     }
                 case .opponent:
                     print("[INFO] Opponent calls player a Liar.")
-                    let (win, sumRoll, biddedRoll) = game.opponentCallsLiar()
-                    if win
+                    print("Player's hand:")
+                    print(game.getPlayerHand())
+                    print("Opponent's hand:")
+                    print(game.getOpponentHand())
+                    let (oppWin, sumRoll, biddedRoll) = game.opponentCallsLiar()
+                    if !oppWin
                     {
                         print(String(format: "There are %i dice with roll %i.", sumRoll, biddedRoll))
                         sleep(1)
@@ -174,6 +184,13 @@ public class MainGame
                 
             case .opponentTurn:
                 // TODO: implement model
+                let probMatrix = computeProbabilityMatrix(hand: game.getOpponentHand(), diceInGame: game.diceInGame)
+                print(String(format: "Probability of %d,%d is: %f", game.currentBidRoll, game.currentBidNumber, probMatrix[game.currentBidNumber][game.currentBidRoll-1]))
+                if determineLiar(prob: probMatrix[game.currentBidNumber][game.currentBidRoll-1], threshold: liarThreshold)
+                {
+                    gamestate = .liar
+                    continue mainloop
+                }
                 let bidRoll = Int.random(in: 1...6)
                 let bidNum = game.currentBidNumber+1
                 _ = game.bid(bidRoll: bidRoll, bidNumber: bidNum)
@@ -198,3 +215,5 @@ public class MainGame
     
     
 }
+
+

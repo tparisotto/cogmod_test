@@ -82,16 +82,15 @@ class Game
         }
         // player calls a wrong liar
         print(sumRolls)
-        if sumRolls > currentBidNumber
+        if currentBidNumber <= sumRolls
         {
-            player.loseDice()
+            opponent.loseDice()
             return (false,sumRolls,currentBidRoll)
             
         }
         else
-        // opponent was bluffing
         {
-            opponent.loseDice()
+            player.loseDice()
             return (true,sumRolls,currentBidRoll)
         }
     }
@@ -104,16 +103,14 @@ class Game
         {
             sumRolls += pl.getRollNumber(roll: currentBidRoll)
         }
-        // player calls a wrong bluff
-        if sumRolls > currentBidNumber
+        if currentBidNumber <= sumRolls
         {
-            opponent.loseDice()
+            player.loseDice()
             return (false,sumRolls,currentBidRoll)
         }
         else
-        // opponent was bluffing
         {
-            player.loseDice()
+            opponent.loseDice()
             return (true,sumRolls,currentBidRoll)
         }
     }

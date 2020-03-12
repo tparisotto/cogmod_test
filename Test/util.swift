@@ -38,6 +38,16 @@ func computeProbabilityMatrix(hand: [Int], diceInGame: Int) -> [[Double]]
     return matrix
 }
 
+func determineLiar(prob: Double, threshold: Double) -> Bool
+{
+    let noise = Double.random(in: -0.1 ... 0.1)
+    if prob < threshold + noise
+    {
+        return true
+    }
+    return false
+}
+
 func factorial(number: Int) -> Int? {
     var result = number
     guard result >= 0 else {return nil}
@@ -49,4 +59,3 @@ func factorial(number: Int) -> Int? {
     }
     return result
 }
-
